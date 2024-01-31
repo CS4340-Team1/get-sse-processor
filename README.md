@@ -49,6 +49,7 @@ git remote add origin https://github.com/CS4340-Team1/get-sse-processor.git
 
 git push -u origin master
 ```
+#### **Remember to commit and push your repo after work is complete, and pull / update your local repo before starting work!**
 
 --------------------------------------
 
