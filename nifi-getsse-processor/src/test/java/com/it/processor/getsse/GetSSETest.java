@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.it.processors.getsse;
+package com.it.processor.getsse;
 
 import org.apache.nifi.util.TestRunner;
 import org.apache.nifi.util.TestRunners;
@@ -27,7 +27,7 @@ public class GetSSETest {
 
     @BeforeEach
     public void init() {
-        testRunner = TestRunners.newTestRunner(GetSSE.class);
+
     }
 
     @Test

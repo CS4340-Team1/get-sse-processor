@@ -28,7 +28,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>nifi-getsse-processors</module>
+        <module>nifi-getsse-processor</module>
         <module>nifi-getsse-nar</module>
     </modules>
 
