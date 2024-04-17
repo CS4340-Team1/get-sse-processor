@@ -49,7 +49,7 @@ import java.util.*;
 @ReadsAttributes({@ReadsAttribute(attribute="asdf", description="asdf")})
 @WritesAttributes({@WritesAttribute(attribute="asdf", description="asdf")})
 public class GetSSE extends AbstractProcessor {
-
+    //URL source of SSE
     public static final PropertyDescriptor URL = new PropertyDescriptor
             .Builder().name("URL")
             .displayName("url")
@@ -65,27 +65,27 @@ public class GetSSE extends AbstractProcessor {
             .addValidator(StandardValidators.POSITIVE_INTEGER_VALIDATOR)
             .defaultValue("10")
             .build();
-
+    //Basic Connection
     public static final Relationship ORIGINAL = new Relationship.Builder()
             .name("Original")
             .description("Request FlowFiles transferred when receiving HTTP responses with a status code between 200 and 299.")
             .build();
-
+    //SEE Return Code
     public static final Relationship RESPONSE = new Relationship.Builder()
             .name("Response")
             .description("Response FlowFiles transferred when receiving HTTP responses with a status code between 200 and 299.")
             .build();
-
+    //
     public static final Relationship RETRY = new Relationship.Builder()
             .name("Retry")
             .description("Request FlowFiles transferred when receiving HTTP responses with a status code between 500 and 599.")
             .build();
-
+    //
     public static final Relationship NO_RETRY = new Relationship.Builder()
             .name("No Retry")
             .description("Request FlowFiles transferred when receiving HTTP responses with a status code between 400 an 499.")
             .build();
-
+    //Website Failure Return
     public static final Relationship FAILURE = new Relationship.Builder()
             .name("Failure")
             .description("Request FlowFiles transferred when receiving socket communication errors.")
