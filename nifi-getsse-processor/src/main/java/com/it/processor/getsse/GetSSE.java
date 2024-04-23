@@ -142,6 +142,7 @@ public class GetSSE extends AbstractProcessor {
             session.putAttribute(flowFile, "error", e.getMessage());
             session.transfer(flowFile, FAILURE);
         }
+        session.transfer(flowFile, RESPONSE);
     }
 
     public void handleEventQueue(int batchSie, final ProcessSession session, FlowFile flowFile){
@@ -154,7 +155,6 @@ public class GetSSE extends AbstractProcessor {
                     outputStream.write(inboundSseEvent.getComment().getBytes());
                     outputStream.write(inboundSseEvent.readData().getBytes());
                 });
-                session.transfer(flowFile, RESPONSE);
             }
         }
     }
