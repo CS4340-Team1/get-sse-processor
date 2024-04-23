@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @ReadsAttributes({@ReadsAttribute(attribute="none", description="Does not Read Attributes")})
 @WritesAttributes({@WritesAttribute(attribute="Nothing yet...", description="TODO")})
 public class GetSSE extends AbstractProcessor {
-
+    //URL source of SSE
     public static final PropertyDescriptor URL = new PropertyDescriptor
             .Builder().name("URL")
             .displayName("URL")
