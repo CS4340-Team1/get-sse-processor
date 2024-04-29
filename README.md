@@ -94,12 +94,14 @@ copy the `nifi-GetSSE-processor-nar-1.0.nar` and paste into your installed NiFi 
 
 ```
 nifi
-├── bin <- paste your nar file here
+├── bin 
 ├── conf
 ├── content_repository
 ├── database_repository
 ├── docs
-.
+├── extensions
+├── flowfile_repository
+├── lib <--------------------- paste your nar file here
 .
 .
 └── work

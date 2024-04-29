@@ -16,10 +16,15 @@
  */
 package com.it.processor.getsse;
 
+import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.util.TestRunner;
 import org.apache.nifi.util.TestRunners;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 
 public class GetSSETest {
 
@@ -27,12 +32,25 @@ public class GetSSETest {
 
     @BeforeEach
     public void init() {
-
+        testRunner = TestRunners.newTestRunner(GetSSE.class);
     }
 
     @Test
     public void testProcessor() {
+        Path URLTest = Paths.get("src/main/java/com/it/processor/getsse/GetSSE.java");
+
+        testRunner.setProperty(GetSSE.URL, "https://www.google.com");
+
+        testRunner.enqueue(URLTest.toString());
+        testRunner.run();
+
+        Relationship expectedRel;
+        expectedRel = GetSSE.RESPONSE;
+        testRunner.assertTransferCount(expectedRel, 1);
+        expectedRel = GetSSE.FAILURE;
+        testRunner.assertTransferCount(expectedRel, 0);
 
     }
 
 }
+
