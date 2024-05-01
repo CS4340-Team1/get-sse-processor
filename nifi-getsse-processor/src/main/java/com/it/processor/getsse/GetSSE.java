@@ -16,16 +16,12 @@
  */
 package com.it.processor.getsse;
 
-
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.sse.InboundSseEvent;
 import jakarta.ws.rs.sse.SseEventSource;
 import org.apache.nifi.annotation.behavior.*;
-import org.apache.nifi.annotation.lifecycle.OnEnabled;
 import org.apache.nifi.annotation.lifecycle.OnScheduled;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.flowfile.FlowFile;
@@ -42,13 +38,18 @@ import org.apache.nifi.processor.util.StandardValidators;
 
 import java.util.*;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.atomic.AtomicReference;
 
 @TriggerWhenEmpty
 @Tags({"SSE, Serve Sent Event"})
 @CapabilityDescription("Provides an GET Endpoint for Server Sent Events.")
 @ReadsAttributes({@ReadsAttribute(attribute="none", description="Does not Read Attributes")})
-@WritesAttributes({@WritesAttribute(attribute="Nothing yet...", description="TODO")})
+@WritesAttributes(
+        {
+                @WritesAttribute(attribute="id", description="SSE event ID"),
+                @WritesAttribute(attribute = "data", description = "Data from SSE event"),
+                @WritesAttribute(attribute = "event", description = "Name of SSE event"),
+                @WritesAttribute(attribute = "comment", description = "Comment (if any) from SSE event")
+        })
 public class GetSSE extends AbstractProcessor {
     //URL source of SSE
     public static final PropertyDescriptor URL = new PropertyDescriptor
@@ -87,9 +88,6 @@ public class GetSSE extends AbstractProcessor {
     private List<PropertyDescriptor> properties;
     private Set<Relationship> relationships;
     private Queue<InboundSseEvent> queue = new LinkedBlockingDeque<>();
-    /*
-    HERE BE BUGS
-     */
 
     @Override
     protected void init(final ProcessorInitializationContext context){
@@ -126,36 +124,30 @@ public class GetSSE extends AbstractProcessor {
         final int batchSize = context.getProperty(BATCH_SIZE).asInteger();
         final ComponentLog log = getLogger();
 
-        ObjectMapper attributes = new ObjectMapper();
-        FlowFile flowFile = session.get();
-
         try{
             try (SseEventSource source = SseEventSource.target(target).build()) {
                 source.open();
-                source.register(inboundSseEvent -> {
-                    queue.add(inboundSseEvent);
-                    handleEventQueue(batchSize, session, flowFile);
-                });
+                source.register(inboundSseEvent -> handleEventQueue(session, inboundSseEvent));
             }
         }catch (final Exception e){
+            FlowFile flowFile = session.create();
             log.error(e.getMessage());
             session.putAttribute(flowFile, "error", e.getMessage());
             session.transfer(flowFile, FAILURE);
         }
-        session.transfer(flowFile, RESPONSE);
     }
 
-    public void handleEventQueue(int batchSie, final ProcessSession session, FlowFile flowFile){
-        if(queue.size() >= batchSie){
-            for(int i = 0; i < batchSie; i++){
-                InboundSseEvent inboundSseEvent = queue.poll();
-                session.write(flowFile, outputStream -> {
-                    outputStream.write(inboundSseEvent.getId().getBytes());
-                    outputStream.write(inboundSseEvent.getName().getBytes());
-                    outputStream.write(inboundSseEvent.getComment().getBytes());
-                    outputStream.write(inboundSseEvent.readData().getBytes());
-                });
-            }
-        }
+    public void handleEventQueue(final ProcessSession session, InboundSseEvent inboundSseEvent){
+        FlowFile flowFile = session.create();
+        Map<String, String> content = new HashMap<>();
+        content.put("id", inboundSseEvent.getId());
+        content.put("event", inboundSseEvent.getName());
+        content.put("data", inboundSseEvent.readData());
+        content.put("comment", inboundSseEvent.getComment());
+
+        flowFile = session.putAllAttributes(flowFile, content);
+        session.getProvenanceReporter().modifyContent(flowFile);
+        session.getProvenanceReporter().route(flowFile, RESPONSE);
+        session.transfer(flowFile, RESPONSE);
     }
 }

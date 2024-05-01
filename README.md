@@ -114,9 +114,28 @@ nifi
 
 -----
 
+If on Linux distribution
+
+```bash
+bin/nifi.sh start
+```
+
+If on windows
+
+```powershell
+bin\run-nifi.bat
+```
+
 # Test
 
 -----
+
+The current test fails as it should, given that the session is not transferring the flowfile out of the reactive code running 
+the SSE Event.
+
+```bash
+mvn test
+```
 
 # Contributing
 

@@ -19,11 +19,11 @@
     <parent>
         <groupId>com.it</groupId>
         <artifactId>nifi-getsee-processor</artifactId>
-        <version>1.0</version>
+        <version>1.1</version>
     </parent>
 
     <artifactId>nifi-getsse-nar</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <packaging>nar</packaging>
 
     <dependencies>
