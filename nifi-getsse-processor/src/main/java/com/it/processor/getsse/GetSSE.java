@@ -136,7 +136,7 @@ public class GetSSE extends AbstractProcessor {
             session.transfer(flowFile, FAILURE);
         }
     }
-
+/*
     public void handleEventQueue(final ProcessSession session, InboundSseEvent inboundSseEvent){
         FlowFile flowFile = session.create();
         Map<String, String> content = new HashMap<>();
@@ -150,4 +150,26 @@ public class GetSSE extends AbstractProcessor {
         session.getProvenanceReporter().route(flowFile, RESPONSE);
         session.transfer(flowFile, RESPONSE);
     }
+}
+*/
+public void handleEventQueue(final ProcessSession session, InboundSseEvent inboundSseEvent){
+    FlowFile flowFile = session.create();
+
+    // Extract attributes from the SSE event
+    Map<String, String> attributes = new HashMap<>();
+    attributes.put("id", inboundSseEvent.getId());
+    attributes.put("event", inboundSseEvent.getName());
+    attributes.put("comment", inboundSseEvent.getComment());
+    flowFile = session.putAllAttributes(flowFile, attributes);
+
+    // Read data from the SSE event and set it as the content of the flow file
+    String eventData = inboundSseEvent.readData();
+    if (eventData != null && !eventData.isEmpty()) {
+        flowFile = session.write(flowFile, out -> out.write(eventData.getBytes()));
+    }
+
+    // Transfer the flow file to the RESPONSE relationship
+    session.getProvenanceReporter().modifyContent(flowFile);
+    session.getProvenanceReporter().route(flowFile, RESPONSE);
+    session.transfer(flowFile, RESPONSE);
 }
